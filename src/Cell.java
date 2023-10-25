@@ -19,7 +19,7 @@ public class Cell<T> {
         if (newValue instanceof Number || newValue instanceof String || newValue instanceof Boolean) {
             this.value = newValue;
         } else {
-            throw new IllegalArgumentException("Invalid type for Cell: " + value.getClass().getName());
+            throw new IllegalArgumentException("Invalid type for Cell: " + newValue.getClass().getName());
         }
     }
 
