@@ -4,7 +4,11 @@ public class Cell<T> {
     private T value;
 
     public Cell(T value) {
-        setValue(value); // Utilizando el setter para centralizar la lógica de validación
+        if (value instanceof Number || value instanceof String || value instanceof Boolean) {
+            this.value = value;
+        } else {
+            throw new IllegalArgumentException("Invalid type for Cell: " + value.getClass().getName());
+        }
     }
 
     public T getValue() {
