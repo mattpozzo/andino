@@ -42,4 +42,12 @@ public class Column<T> {
             }
         }
     }
+
+    public T[] toArray() {
+        T[] array = (T[]) new Object[this.cells.size()];
+        for (int i=0; i < this.cells.size(); i++) {
+            array[i] = this.cells.get(i).getValue();
+        }
+        return array;
+    }
 }

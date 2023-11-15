@@ -1,8 +1,11 @@
 // DataFrame.java
 package src;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class DataFrame {
     private Map<Object, Column<Object>> columns = new HashMap<>();
@@ -81,7 +84,7 @@ public class DataFrame {
         this.indexes.add(index); 
     }
 
-    public ArrayList<Object> getRow(Object index) {
+    public List<Object> getRow(Object index) {
         ArrayList<Object> row = new ArrayList<>();
         for (Object header : this.headers) {
             row.add(this.columns.get(header).getCellValue(this.indexes.indexOf(index)));
@@ -89,7 +92,7 @@ public class DataFrame {
         return row;
     }
 
-    public ArrayList<Object> getHeaders() {
+    public List<Object> getHeaders() {
         return this.headers;
     }
 
@@ -116,7 +119,7 @@ public class DataFrame {
         this.headers.set(this.headers.indexOf(oldHeader), newHeader);
     }
 
-    public ArrayList<Object> getIndexes() {
+    public List<Object> getIndexes() {
         return this.indexes;
     }
 
@@ -137,6 +140,81 @@ public class DataFrame {
         int index = this.indexes.indexOf(oldIndex);
 
         this.indexes.set(index, newIndex);
+    }
+
+    public Object[][] toArray() {
+        Object[][] array = new Object[this.indexes.size()][this.headers.size()];
+        for (int i = 0; i < this.indexes.size(); i++) {
+            for (int j = 0; j < this.headers.size(); j++) {
+                array[i][j] = this.columns.get(this.headers.get(j)).getCellValue(i);
+            }
+        }
+        return array;
+    } 
+
+    public DataFrame sort(Object header, boolean ascending) {
+        if (!this.headers.contains(header)) {
+            throw new IllegalArgumentException(String.format("El header '%s' no existe.", header.toString()));
+        }
+
+        Column<Object> column = this.columns.get(header);
+
+        Object[] sortedColumn = column.toArray();
+
+        Arrays.sort(sortedColumn);
+
+        if (!ascending) {
+            Object[] reversedColumn = new Object[sortedColumn.length];
+            for (int i = 0; i < sortedColumn.length; i++) {
+                reversedColumn[i] = sortedColumn[sortedColumn.length - 1 - i];
+            }
+            sortedColumn = reversedColumn;
+        }
+
+        DataFrame sortedDf = new DataFrame();
+
+        for (Object headerName : this.headers) {
+            Column<Object> newColumn = new Column<>(new Object[0]);
+            sortedDf.addColumn(headerName, newColumn);
+        }
+
+        for (Object value : sortedColumn) {
+            for (Object headerName : this.headers) {
+                sortedDf.columns.get(headerName).addCell(
+                    this.columns.get(headerName).getCellValue(
+                        Arrays.asList(column.toArray()).indexOf(value)
+                    )
+                );
+            }
+        }
+
+        return sortedDf;
+    }
+
+    // TODO: sort con varios headers para ordenar por más de una columna
+
+    public DataFrame filter(Predicate<Object> predicate) {
+        // TODO: REVISAR QUE ESTO ESTÉ BIEN
+        DataFrame filteredDf = new DataFrame();
+
+        for (Object headerName : this.headers) {
+            Column<Object> newColumn = new Column<>(new Object[0]);
+            filteredDf.addColumn(headerName, newColumn);
+        }
+
+        for (Object index : this.indexes) {
+            if (predicate.test(index)) {
+                for (Object headerName : this.headers) {
+                    filteredDf.columns.get(headerName).addCell(
+                        this.columns.get(headerName).getCellValue(
+                            this.indexes.indexOf(index)
+                        )
+                    );
+                }
+            }
+        }
+
+        return filteredDf;
     }
 
     public static void main(String[] args) throws Exception {
