@@ -3,7 +3,9 @@ package src;
 import java.util.ArrayList;
 
 public class Column<T> {
-    private ArrayList<Cell<T>> cells = new ArrayList<>(); // Inicializar cells
+    private ArrayList<Cell<T>> cells = new ArrayList<>();
+
+    public Column() {}
 
     public Column(T[] cellsElements) {
         for (int i=0; i < cellsElements.length; i++) {
