@@ -9,9 +9,9 @@ import java.util.function.Predicate;
 import java.util.Random;
 
 public class DataFrame {
-    private Map<Object, Column<Object>> columns = new HashMap<>();
-    private ArrayList<Object> headers = new ArrayList<>();
-    private ArrayList<Object> indexes = new ArrayList<>();
+    protected Map<Object, Column<Object>> columns = new HashMap<>();
+    protected List<Object> headers = new ArrayList<>();
+    protected List<Object> indexes = new ArrayList<>();
 
     public void addColumn(Object header, Column<Object> column) {
         if (this.indexes.isEmpty()) {
@@ -29,6 +29,10 @@ public class DataFrame {
         return this.columns.get(header);
     }
 
+    public Map<Object, Column<Object>> getColumns() {
+        return this.columns;
+    }
+
     public void addRow(Object[] row) {
         if (row.length != this.columns.size()) {
             // TODO: Definir clase para este tipo de excepción
@@ -39,7 +43,7 @@ public class DataFrame {
             this.columns.get(this.headers.get(i)).addCell(row[i]);
         }
 
-        ArrayList<Integer> intIndexes = new ArrayList<>();
+        List<Integer> intIndexes = new ArrayList<>();
 
         for (Object index : this.indexes) {
             if (index instanceof Integer) {
@@ -78,7 +82,7 @@ public class DataFrame {
     }
 
     public List<Object> getRow(Object index) {
-        ArrayList<Object> row = new ArrayList<>();
+        List<Object> row = new ArrayList<>();
         for (Object header : this.headers) {
             row.add(this.columns.get(header).getCellValue(this.indexes.indexOf(index)));
         }
@@ -393,5 +397,52 @@ public class DataFrame {
         return sliceDf;
     }
 
+<<<<<<< Updated upstream
+=======
+    public GroupedDataFrame groupBy(Object[] headers) {
+        if (headers.length == 0) {
+            throw new IllegalArgumentException("Debe especificar al menos un header.");
+        }
+
+        if (headers.length > this.headers.size()) {
+            throw new IllegalArgumentException("La cantidad de headers especificados es mayor a la cantidad de headers del DataFrame.");
+        }
+
+        if (!this.headers.containsAll(Arrays.asList(headers))) {
+            throw new IllegalArgumentException("Alguno de los headers especificados no existe.");
+        }
+        
+        Map<String, List<Object>> groups = new HashMap<>();
+
+        for (int i = 0; i < this.indexes.size(); i++) {
+            String key = "";
+
+            for (Object header : headers) {
+                key += this.columns.get(header).getCellValue(i).toString() + ',';
+            }
+
+            key = key.substring(0, key.length() - 1);
+
+            groups.computeIfAbsent(key, k -> new ArrayList<>()).add(this.indexes.get(i));
+        }
+
+        return new GroupedDataFrame(this, groups);
+    }
+
+    public static void main(String[] args) throws Exception {
+        CsvReader reader = new CsvReader(',', true);
+        DataFrame df = reader.read("test.csv");
+
+        // Imprimir el DataFrame para ver los resultados
+        for (Object header : df.getHeaders()) {
+            Column<?> column = df.getColumn(header);
+            System.out.print(header + ": ");
+            for (int i = 0; i < column.getSize(); i++) {
+                System.out.print(column.getCellValue(i) + " ");
+            }
+            System.out.println();
+        }
+    }
+>>>>>>> Stashed changes
 
 }

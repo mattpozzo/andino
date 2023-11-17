@@ -1,16 +1,16 @@
 package src;
 
+import java.util.List;
+import java.util.Map;
+
 public class GroupedDataFrame extends DataFrame {
-    private DataFrame df;
-    private String[] columnNames;
+    private Map<String, List<Object>> groups;
 
-    public GroupedDataFrame(DataFrame df, String[] columnNames) {
-        this.df = df;
-        this.columnNames = columnNames;
-    }
-
-    public DataFrame getDf() {
-        return this.df;
+    public GroupedDataFrame(DataFrame df, Map<String, List<Object>> groups) {
+        this.columns = df.getColumns();
+        this.headers = df.getHeaders();
+        this.indexes = df.getIndexes();
+        this.groups = groups;
     }
 
     public String[] getColumnNames() {
