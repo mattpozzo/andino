@@ -59,20 +59,20 @@ public class CsvReader implements DataReader {
 
             if (hasHeaders) {
                 for (int i = 0; i < headers.size(); i++) {
-                    List<String> columnData = new ArrayList<>();
+                    List<Object> columnData = new ArrayList<>();
                     for (String[] row : data) {
                         columnData.add(row[i]);
                     }
-                    Column<String> column = new Column<>(columnData.toArray(new String[0]), headers.get(i));
+                    Column<Object> column = new Column<>(columnData.toArray(new Object[0]));
                     df.addColumn(headers.get(i), column);
                 }
             } else {
                 for (int i = 0; i < data.get(0).length; i++) {
-                    List<String> columnData = new ArrayList<>();
+                    List<Object> columnData = new ArrayList<>();
                     for (String[] row : data) {
                         columnData.add(row[i]);
                     }
-                    Column<String> column = new Column<>(columnData.toArray(new String[0]), "Column" + (i + 1));
+                    Column<Object> column = new Column<>(columnData.toArray(new Object[0]));
                     df.addColumn("Column" + (i + 1), column);
                 }
             }
