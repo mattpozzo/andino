@@ -14,21 +14,13 @@ public class DataFrame {
     private ArrayList<Object> indexes = new ArrayList<>();
 
     public void addColumn(Object header, Column<Object> column) {
-        if (!(header instanceof String) && !(header instanceof Integer)) {
-            // TODO: Definir clase para este tipo de excepción
-            throw new IllegalArgumentException("El header debe ser String o Integer.");
-        }
-
-        if (column.getSize() != this.indexes.size()) {
-            // TODO: Definir clase para este tipo de excepción
+        if (this.indexes.isEmpty()) {
+            for (int i = 0; i < column.getSize(); i++) {
+                this.indexes.add(i);
+            }
+        } else if (column.getSize() != this.indexes.size()) {
             throw new IllegalArgumentException("El tamaño de la columna no coincide con la cantidad de filas.");
         }
-
-        if (this.headers.contains(header)) {
-            // TODO: Definir clase para este tipo de excepción
-            throw new IllegalArgumentException("El header ya existe.");
-        }
-
         this.columns.put(header, column);
         this.headers.add(header);
     }
@@ -401,19 +393,5 @@ public class DataFrame {
         return sliceDf;
     }
 
-    public static void main(String[] args) throws Exception {
-        CsvReader reader = new CsvReader(',', true);
-        DataFrame df = reader.read("test.csv");
-
-        // Imprimir el DataFrame para ver los resultados
-        for (Object header : df.getHeaders()) {
-            Column<?> column = df.getColumn(header);
-            System.out.print(header + ": ");
-            for (int i = 0; i < column.getSize(); i++) {
-                System.out.print(column.getCellValue(i) + " ");
-            }
-            System.out.println();
-        }
-    }
 
 }
