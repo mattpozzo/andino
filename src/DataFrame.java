@@ -397,8 +397,6 @@ public class DataFrame {
         return sliceDf;
     }
 
-<<<<<<< Updated upstream
-=======
     public GroupedDataFrame groupBy(Object[] headers) {
         if (headers.length == 0) {
             throw new IllegalArgumentException("Debe especificar al menos un header.");
@@ -429,20 +427,5 @@ public class DataFrame {
         return new GroupedDataFrame(this, groups);
     }
 
-    public static void main(String[] args) throws Exception {
-        CsvReader reader = new CsvReader(',', true);
-        DataFrame df = reader.read("test.csv");
-
-        // Imprimir el DataFrame para ver los resultados
-        for (Object header : df.getHeaders()) {
-            Column<?> column = df.getColumn(header);
-            System.out.print(header + ": ");
-            for (int i = 0; i < column.getSize(); i++) {
-                System.out.print(column.getCellValue(i) + " ");
-            }
-            System.out.println();
-        }
-    }
->>>>>>> Stashed changes
 
 }
