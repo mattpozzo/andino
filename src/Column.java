@@ -21,6 +21,10 @@ public class Column<T> {
         return cells.size();
     }
 
+    public void addCell() {
+        this.cells.add(new Cell<>(null));
+    }
+
     public void addCell(T cell) {
         this.cells.add(new Cell<>(cell));
     }
