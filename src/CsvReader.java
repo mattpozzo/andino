@@ -63,7 +63,7 @@ public class CsvReader implements DataReader {
                     for (String[] row : data) {
                         columnData.add(row[i]);
                     }
-                    Column<Object> column = new Column<>(columnData.toArray(new Object[0]));
+                    Column<Object> column = new Column<>(columnData.toArray(new String[0]));
                     df.addColumn(headers.get(i), column);
                 }
             } else {
@@ -72,7 +72,7 @@ public class CsvReader implements DataReader {
                     for (String[] row : data) {
                         columnData.add(row[i]);
                     }
-                    Column<Object> column = new Column<>(columnData.toArray(new Object[0]));
+                    Column<Object> column = new Column<>(columnData.toArray(new String[0]));
                     df.addColumn("Column" + (i + 1), column);
                 }
             }
