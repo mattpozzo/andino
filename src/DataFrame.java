@@ -236,7 +236,13 @@ public class DataFrame {
         for (int i = 0; i < this.indexes.size(); i++) {
             string += this.indexes.get(i);
             for (Object header : this.headers) {
-                string += " | " + this.columns.get(header).getCellValue(i);
+                Object value = this.columns.get(header).getCellValue(i);
+
+                if (value == null) {
+                    value = "N/A";
+                }
+
+                string += " | " + value;
             }
             string += "\n";
         }
