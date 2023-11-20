@@ -110,7 +110,7 @@ public class DataFrameTest {
         }
     }
 
-    public static void main(String[] args) {
+    public static void export(String[] args) {
         // Test para export
         System.out.println("\nTest export:");
         try {
@@ -134,4 +134,28 @@ public class DataFrameTest {
         }
     }
 
+
+
+    public static void main(String[] args) {
+
+        // Test para info
+        System.out.println("\nTest info:");
+        try {
+            DataFrame df = new DataFrame();
+            // Agregar datos al DataFrame
+            Column<Object> column1 = new Column<>();
+            column1.addCell("Data1");
+            column1.addCell("Data2");
+            df.addColumn("Column1", column1);
+
+            Column<Object> column2 = new Column<>();
+            column2.addCell(100);
+            column2.addCell(null);
+            df.addColumn("Column2", column2);
+            
+            df.info();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

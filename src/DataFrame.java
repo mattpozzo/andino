@@ -484,4 +484,31 @@ public class DataFrame {
             }
         }
     }
+
+    public void info() {
+        System.out.println("Información del DataFrame:");
+        System.out.println("Columna\tTipo\tNo Nulos\tNulos");
+        
+        for (Object header : headers) {
+            Column<Object> column = columns.get(header);
+            int nonNullCount = 0;
+            int nullCount = 0;
+            String dataType = "Desconocido";
+
+            for (int i = 0; i < column.getSize(); i++) {
+                Object cellValue = column.getCellValue(i);
+                if (cellValue != null) {
+                    nonNullCount++;
+                    if (dataType.equals("Desconocido")) {
+                        dataType = cellValue.getClass().getSimpleName();
+                    }
+                } else {
+                    nullCount++;
+                }
+            }
+
+            System.out.println(header + "\t" + dataType + "\t" + nonNullCount + "\t" + nullCount);
+        }
+    }
+
 }
