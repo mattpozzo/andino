@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CsvReader implements DataReader {
-    char separator;
-    boolean hasHeaders;
+    private char separator;
+    private boolean hasHeaders;
 
     public CsvReader(char separator, boolean hasHeaders) {
         this.separator = separator;
