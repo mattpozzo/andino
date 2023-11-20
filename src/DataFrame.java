@@ -12,9 +12,15 @@ import java.util.function.Predicate;
 import java.util.Random;
 
 public class DataFrame {
-    private Map<Object, Column<Object>> columns = new HashMap<>();
-    private ArrayList<Object> headers = new ArrayList<>();
-    private ArrayList<Object> indexes = new ArrayList<>();
+    protected Map<Object, Column<Object>> columns;
+    protected List<Object> headers;
+    protected List<Object> indexes;
+
+    public DataFrame() {
+        this.columns = new HashMap<>();
+        this.headers = new ArrayList<>();
+        this.indexes = new ArrayList<>();
+    }
 
     public void addColumn(Object header, Column<Object> column) {
         if (this.indexes.isEmpty()) {
@@ -32,6 +38,10 @@ public class DataFrame {
         return this.columns.get(header);
     }
 
+    public Map<Object, Column<Object>> getColumns() {
+        return this.columns;
+    }
+
     public void addRow(Object[] row) {
         if (row.length != this.columns.size()) {
             // TODO: Definir clase para este tipo de excepción
@@ -42,7 +52,7 @@ public class DataFrame {
             this.columns.get(this.headers.get(i)).addCell(row[i]);
         }
 
-        ArrayList<Integer> intIndexes = new ArrayList<>();
+        List<Integer> intIndexes = new ArrayList<>();
 
         for (Object index : this.indexes) {
             if (index instanceof Integer) {
@@ -81,7 +91,7 @@ public class DataFrame {
     }
 
     public List<Object> getRow(Object index) {
-        ArrayList<Object> row = new ArrayList<>();
+        List<Object> row = new ArrayList<>();
         for (Object header : this.headers) {
             row.add(this.columns.get(header).getCellValue(this.indexes.indexOf(index)));
         }
@@ -294,6 +304,7 @@ public class DataFrame {
     }
 
     public DataFrame sample(float percent) {
+        // TODO: validar valor de percent
         DataFrame sampleDf = new DataFrame();
 
         for (Object header : this.headers) {
@@ -396,6 +407,36 @@ public class DataFrame {
         return sliceDf;
     }
 
+    public GroupedDataFrame groupBy(Object[] headers) {
+        if (headers.length == 0) {
+            throw new IllegalArgumentException("Debe especificar al menos un header.");
+        }
+
+        if (headers.length > this.headers.size()) {
+            throw new IllegalArgumentException("La cantidad de headers especificados es mayor a la cantidad de headers del DataFrame.");
+        }
+
+        if (!this.headers.containsAll(Arrays.asList(headers))) {
+            throw new IllegalArgumentException("Alguno de los headers especificados no existe.");
+        }
+        
+        Map<String, List<Object>> groups = new HashMap<>();
+
+        for (int i = 0; i < this.indexes.size(); i++) {
+            String key = "";
+
+            for (Object header : headers) {
+                key += this.columns.get(header).getCellValue(i).toString() + ',';
+            }
+
+            key = key.substring(0, key.length() - 1);
+
+            groups.computeIfAbsent(key, k -> new ArrayList<>()).add(this.indexes.get(i));
+        }
+
+        return new GroupedDataFrame(this, groups);
+    }
+
     public DataFrame copy() {
         DataFrame copiedDf = new DataFrame();
         
@@ -444,5 +485,4 @@ public class DataFrame {
             }
         }
     }
-
 }
