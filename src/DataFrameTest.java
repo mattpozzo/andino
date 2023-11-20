@@ -1,5 +1,7 @@
 package src;
 
+
+
 public class DataFrameTest {
 
     public static void csvReader(String[] args) throws Exception {
@@ -73,8 +75,63 @@ public class DataFrameTest {
             e.printStackTrace();
         }
 
-        // ... Puedes agregar más pruebas para otros métodos aquí ...
 
-        // Por ejemplo, para sort, filter, etc.
+
+
     }
+
+
+    public static void copy(String[] args) {
+        System.out.println("\nTest copy:");
+        try {
+            // Crear una instancia de DataFrame
+            DataFrame df = new DataFrame();
+
+            // Agregar datos al DataFrame
+            Column<Object> column1 = new Column<>();
+            column1.addCell("Data1");
+            column1.addCell("Data2");
+            df.addColumn("Column1", column1);
+
+            Column<Object> column2 = new Column<>();
+            column2.addCell(100);
+            column2.addCell(200);
+            df.addColumn("Column2", column2);
+
+            // Hacer una copia del DataFrame
+            DataFrame copiedDf = df.copy();
+
+            // Verificar si la copia es correcta (puedes hacer más comprobaciones aquí)
+            boolean copyTestResult = copiedDf.getColumn("Column1").getCellValue(0).equals("Data1") &&
+                                        copiedDf.getColumn("Column2").getCellValue(1).equals(200);
+            System.out.println("Copia realizada correctamente: " + copyTestResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        // Test para export
+        System.out.println("\nTest export:");
+        try {
+            DataFrame df = new DataFrame();
+            // Agregar datos al DataFrame
+            Column<Object> column1 = new Column<>();
+            column1.addCell("Data1");
+            column1.addCell("Data2");
+            df.addColumn("Column1", column1);
+
+            Column<Object> column2 = new Column<>();
+            column2.addCell(100);
+            column2.addCell(200);
+            df.addColumn("Column2", column2);
+            
+            // Exportar DataFrame a un archivo CSV
+            df.export("output.csv", ',', true);
+            System.out.println("DataFrame exportado correctamente a output.csv");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -1,5 +1,8 @@
 // DataFrame.java
 package src;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -393,5 +396,53 @@ public class DataFrame {
         return sliceDf;
     }
 
+    public DataFrame copy() {
+        DataFrame copiedDf = new DataFrame();
+        
+        for (Object header : this.headers) {
+            copiedDf.headers.add(header); //
+        }
+        for (Object index : this.indexes) {
+            copiedDf.indexes.add(index);
+        }
+
+        for (Map.Entry<Object, Column<Object>> entry : this.columns.entrySet()) {
+            Column<Object> originalColumn = entry.getValue();
+            Column<Object> copiedColumn = new Column<>();
+
+            for (int i = 0; i < originalColumn.getSize(); i++) {
+                copiedColumn.addCell(originalColumn.getCellValue(i));
+            }
+
+            copiedDf.columns.put(entry.getKey(), copiedColumn);
+        }
+
+        return copiedDf;
+    }
+
+
+    public void export(String filePath, char delimiter, boolean includeHeader) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            if (includeHeader) {
+                for (int i = 0; i < headers.size(); i++) {
+                    writer.print(headers.get(i));
+                    if (i < headers.size() - 1) {
+                        writer.print(delimiter);
+                    }
+                }
+                writer.println();
+            }
+
+            for (int i = 0; i < indexes.size(); i++) {
+                for (int j = 0; j < headers.size(); j++) {
+                    writer.print(getColumn(headers.get(j)).getCellValue(i));
+                    if (j < headers.size() - 1) {
+                        writer.print(delimiter);
+                    }
+                }
+                writer.println();
+            }
+        }
+    }
 
 }
