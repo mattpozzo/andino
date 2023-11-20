@@ -4,7 +4,7 @@ public class Cell<T> {
     private T value;
 
     public Cell(T value) {
-        if (value instanceof Number || value instanceof String || value instanceof Boolean) {
+        if (value == null || value instanceof Number || value instanceof String || value instanceof Boolean) {
             this.value = value;
         } else {
             throw new IllegalArgumentException("Invalid type for Cell: " + value.getClass().getName());
@@ -16,7 +16,7 @@ public class Cell<T> {
     }
 
     public void setValue(T newValue) {
-        if (newValue instanceof Number || newValue instanceof String || newValue instanceof Boolean) {
+        if (newValue == null || newValue instanceof Number || newValue instanceof String || newValue instanceof Boolean) {
             this.value = newValue;
         } else {
             throw new IllegalArgumentException("Invalid type for Cell: " + newValue.getClass().getName());
