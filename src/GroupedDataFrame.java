@@ -155,33 +155,33 @@ public class GroupedDataFrame extends DataFrame {
         if (!this.headers.contains(header)) {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
-
-        if (!this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
-            throw new IllegalArgumentException("La columna seleccionada no es numérica.");
-        }
-
+    
         DataFrame df = new DataFrame();
         Column<Object> column = new Column<>();
-
+    
         df.addColumn("mean " + header.toString(), column);
-
+    
         for (Map.Entry<String, List<Object>> group : this.groups.entrySet()) {
             String groupName = group.getKey();
             List<Object> groupIndexes = group.getValue();
-
-            Double[] mean = {0.0};
-
+    
+            double sum = 0.0;
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                mean[0] += (double) this.getColumn(header).getCellValue(cellIndex);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue instanceof Integer) {
+                    sum += (Integer) cellValue;
+                }
             }
-            mean[0] /= groupIndexes.size();
-
-            df.addRow(mean, groupName);
+            double mean = sum / groupIndexes.size();
+    
+            Object[] meanRow = new Object[]{mean};
+            df.addRow(meanRow, groupName);
         }
-
+    
         return df;
     }
+    
 
     public DataFrame mean(Object[] headers) {
         if (!this.headers.containsAll(Arrays.asList(headers))) {

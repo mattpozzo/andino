@@ -9,16 +9,15 @@ public class DataFrameTest {
         DataFrame df = reader.read("test.csv");
 
         // Imprimir el DataFrame para ver los resultados
-        for (Object header : df.getHeaders()) {
-            Column<?> column = df.getColumn(header);
-            System.out.print(header + ": ");
-            for (int i = 0; i < column.getSize(); i++) {
-                System.out.print(column.getCellValue(i) + " ");
-            }
-            System.out.println();
-        }
-    }
+        System.out.println(df);
 
+        df.info();
+
+        DataFrame sortedDfByAge = df.sort("Age", true);
+        System.out.println(sortedDfByAge);
+
+    }
+    
     public static void metodos(String[] args) {
         // Crear una instancia de DataFrame para las pruebas
         DataFrame df = new DataFrame();

@@ -228,26 +228,34 @@ public class DataFrame {
 
     @Override
     public String toString() {
-        String string = "   ";
+        StringBuilder sb = new StringBuilder();
+        
+        // Define el ancho para las columnas y los índices
+        int indexWidth = 6; // Ajusta este valor según tus necesidades
+        int columnWidth = 12; // Ajusta este valor según tus necesidades
+    
+        // Encabezado de la tabla
+        sb.append(String.format("%-" + indexWidth + "s", "Index"));
         for (Object header : this.headers) {
-            string += " | " + header;
+            sb.append(String.format("| %-" + columnWidth + "s", header));
         }
-        string += "\n";
+        sb.append("\n");
+    
+        // Datos de la tabla
         for (int i = 0; i < this.indexes.size(); i++) {
-            string += this.indexes.get(i);
+            sb.append(String.format("%-" + indexWidth + "s", this.indexes.get(i).toString())); // Asumiendo que los índices pueden ser de cualquier tipo
             for (Object header : this.headers) {
                 Object value = this.columns.get(header).getCellValue(i);
-
-                if (value == null) {
-                    value = "N/A";
-                }
-
-                string += " | " + value;
+                String formattedValue = value == null ? "N/A" : value.toString();
+                sb.append(String.format("| %-" + columnWidth + "s", formattedValue));
             }
-            string += "\n";
+            sb.append("\n");
         }
-        return string;
+    
+        return sb.toString();
     }
+    
+    
 
     public void deleteRow(Object index) {
         if (!this.indexes.contains(index)) {
@@ -492,15 +500,24 @@ public class DataFrame {
     }
 
     public void info() {
+        // Ancho para cada columna en la salida
+        int columnWidth = 15;
+        int typeWidth = 15;
+        int countWidth = 10;
+    
         System.out.println("Información del DataFrame:");
-        System.out.println("Columna\tTipo\tNo Nulos\tNulos");
-        
+        System.out.printf("%-" + columnWidth + "s%-"
+                + typeWidth + "s%-"
+                + countWidth + "s%-"
+                + countWidth + "s%n",
+                "Columna", "Tipo", "No Nulos", "Nulos");
+    
         for (Object header : headers) {
             Column<Object> column = columns.get(header);
             int nonNullCount = 0;
             int nullCount = 0;
             String dataType = "Desconocido";
-
+    
             for (int i = 0; i < column.getSize(); i++) {
                 Object cellValue = column.getCellValue(i);
                 if (cellValue != null) {
@@ -512,9 +529,13 @@ public class DataFrame {
                     nullCount++;
                 }
             }
-
-            System.out.println(header + "\t" + dataType + "\t" + nonNullCount + "\t" + nullCount);
+            System.out.printf("%-" + columnWidth + "s%-"
+                    + typeWidth + "s%-"
+                    + countWidth + "d%-"
+                    + countWidth + "d%n",
+                    header, dataType, nonNullCount, nullCount);
         }
     }
+    
 
 }
