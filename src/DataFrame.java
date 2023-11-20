@@ -295,6 +295,7 @@ public class DataFrame {
     }
 
     public DataFrame sample(float percent) {
+        // TODO: validar valor de percent
         DataFrame sampleDf = new DataFrame();
 
         for (Object header : this.headers) {
