@@ -4,7 +4,7 @@ package src;
 
 public class DataFrameTest {
 
-    public static void csvReader(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         CsvReader reader = new CsvReader(',', true);
         DataFrame df = reader.read("test.csv");
 
@@ -136,7 +136,7 @@ public class DataFrameTest {
 
 
 
-    public static void main(String[] args) {
+    public static void info(String[] args) {
 
         // Test para info
         System.out.println("\nTest info:");
@@ -150,7 +150,7 @@ public class DataFrameTest {
 
             Column<Object> column2 = new Column<>();
             column2.addCell(100);
-            column2.addCell(null);
+            column2.addCell();
             df.addColumn("Column2", column2);
             
             df.info();
