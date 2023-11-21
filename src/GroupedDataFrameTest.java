@@ -2,7 +2,7 @@ package src;
 
 public class GroupedDataFrameTest {
 
-    public static void main(String[] args) {
+    public static void fromAdds(String[] args) {
         // Crear un DataFrame con algunos datos
         DataFrame df = new DataFrame();
 
@@ -26,6 +26,29 @@ public class GroupedDataFrameTest {
         // Calcular el promedio de la columna "Age" para cada grupo
         DataFrame meanDf = groupedDf.mean("Age");
         System.out.println("Promedio de Edades por Nombre:");
+        System.out.println(meanDf);
+    }
+
+    public static void main(String[] args) {
+        CsvReader reader = new CsvReader(',', true);
+        DataFrame df = reader.read("test.csv");
+
+        // Imprimir el DataFrame original
+        System.out.println("DataFrame Original:");
+        System.out.println(df);
+
+        // Agrupar el DataFrame por la columna "Occupation"
+        GroupedDataFrame groupedDf = df.groupBy(new Object[]{"Occupation"});
+        System.out.println(groupedDf);
+
+        // Calcular la máxima de la columna "Age" para cada grupo
+        DataFrame sumDf = groupedDf.max("Age");
+        System.out.println("Máxima edad por ocupación:");
+        System.out.println(sumDf);
+
+        // Calcular el promedio de la columna "Age" para cada grupo
+        DataFrame meanDf = groupedDf.mean("Age");
+        System.out.println("Promedio de edades por ocupación:");
         System.out.println(meanDf);
     }
 }

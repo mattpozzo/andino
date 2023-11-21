@@ -3,8 +3,8 @@ package src;
 
 
 public class DataFrameTest {
-
-    public static void main(String[] args) throws Exception {
+    // 21/11/23: HACER TESTS PARA TODOS LOS MÉTODOS DE DATAFRAME Y GROUPEDDATAFRAME
+    public static void csvReader(String[] args) throws Exception {
         CsvReader reader = new CsvReader(',', true);
         DataFrame df = reader.read("test.csv");
 
@@ -14,13 +14,18 @@ public class DataFrameTest {
         df.info();
 
         DataFrame sortedDfByAge = df.sort("Age", true);
+
         System.out.println(sortedDfByAge);
 
+        DataFrame filteredDf = df.filter("Occupation", occ -> occ.equals("Programmer"));
+
+        System.out.println(filteredDf);
     }
     
-    public static void metodos(String[] args) {
+    public static void addAndDelete(String[] args) {
         // Crear una instancia de DataFrame para las pruebas
         DataFrame df = new DataFrame();
+        System.out.println(df);	
 
         // Test para addColumn
         System.out.println("Test addColumn:");
@@ -37,6 +42,7 @@ public class DataFrameTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(df);	
 
         // Test para addRow
         System.out.println("\nTest addRow:");
@@ -47,22 +53,58 @@ public class DataFrameTest {
             df.addRow(row); 
 
             // Verificar si la fila se agregó correctamente
-            boolean testResultRow = "Row1Col1".equals(df.getRow(0).get(0)) &&
-                                    "Row1Col2".equals(df.getRow(0).get(1));
+            boolean testResultRow = "Row1Col1".equals(df.getRow(2).get(0));
             System.out.println("Fila agregada correctamente: " + testResultRow);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(df);	
+
+        // Test para addColumn
+        System.out.println("Test addColumn:");
+        try {
+            Column<Object> column = new Column<>();
+            column.addCell(377);
+            column.addCell(610);
+            column.addCell(987);
+            df.addColumn(1123, column);
+
+            // Verificar si la columna se agregó correctamente
+            boolean testResult = 377 == (int) (df.getColumn(1123).getCellValue(0)) &&
+                                 610 == (int) (df.getColumn(1123).getCellValue(1)) &&
+                                 987 == (int) (df.getColumn(1123).getCellValue(2));
+            System.out.println("Columna agregada correctamente: " + testResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(df);	
+
+        // Test para addRow
+        System.out.println("\nTest addRow:");
+        try {
+            Object[] row = {"Row2Col1", 610 + 987};
+
+
+            df.addRow(row, "FIB"); 
+
+            // Verificar si la fila se agregó correctamente
+            boolean testResultRow = "Row2Col1".equals(df.getRow("FIB").get(0));
+            System.out.println("Fila agregada correctamente: " + testResultRow);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(df);	
 
         // Test para deleteRow
         System.out.println("\nTest deleteRow:");
         try {
-            df.deleteRow(0);
-            boolean testDeleteRow = !df.getIndexes().contains(0);
+            df.deleteRow(1);
+            boolean testDeleteRow = !df.getIndexes().contains(1);
             System.out.println("Fila eliminada correctamente: " + testDeleteRow);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(df);	
 
         // Test para deleteColumn
         System.out.println("\nTest deleteColumn:");
@@ -73,14 +115,11 @@ public class DataFrameTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
+        System.out.println(df);
     }
 
 
-    public static void copy(String[] args) {
+    public static void main(String[] args) {
         System.out.println("\nTest copy:");
         try {
             // Crear una instancia de DataFrame
@@ -97,8 +136,13 @@ public class DataFrameTest {
             column2.addCell(200);
             df.addColumn("Column2", column2);
 
+            System.out.println(df);
+
             // Hacer una copia del DataFrame
             DataFrame copiedDf = df.copy();
+            df.addRow(new Object[] {"Data3", 300});
+
+            System.out.println(copiedDf);
 
             // Verificar si la copia es correcta (puedes hacer más comprobaciones aquí)
             boolean copyTestResult = copiedDf.getColumn("Column1").getCellValue(0).equals("Data1") &&
@@ -132,7 +176,6 @@ public class DataFrameTest {
             e.printStackTrace();
         }
     }
-
 
 
     public static void info(String[] args) {

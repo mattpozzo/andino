@@ -167,7 +167,21 @@ public class DataFrame {
 
         Object[] sortedColumn = column.toArray();
 
-        Arrays.sort(sortedColumn);
+        Arrays.sort(sortedColumn, (a, b) -> {
+            if (a == null) {
+                return 1;
+            } else if (b == null) {
+                return -1;
+            } else if (a instanceof String && b instanceof String) {
+                return ((String) a).compareTo((String) b);
+            } else if (a instanceof Integer && b instanceof Integer) {
+                return ((Integer) a).compareTo((Integer) b);
+            } else if (a instanceof Boolean && b instanceof Boolean) {
+                return ((Boolean) a).compareTo((Boolean) b);
+            } else {
+                throw new IllegalArgumentException("No se puede comparar los valores de la columna.");
+            }
+        });
 
         if (!ascending) {
             Object[] reversedColumn = new Object[sortedColumn.length];
@@ -181,17 +195,16 @@ public class DataFrame {
 
         for (Object headerName : this.headers) {
             Column<Object> newColumn = new Column<>();
-            sortedDf.addColumn(headerName, newColumn);
-        }
 
-        for (Object value : sortedColumn) {
-            for (Object headerName : this.headers) {
-                sortedDf.columns.get(headerName).addCell(
+            for (Object value : sortedColumn) {
+                newColumn.addCell(
                     this.columns.get(headerName).getCellValue(
                         Arrays.asList(column.toArray()).indexOf(value)
                     )
                 );
             }
+
+            sortedDf.addColumn(headerName, newColumn);
         }
 
         return sortedDf;
@@ -210,17 +223,16 @@ public class DataFrame {
 
         for (Object headerName : this.headers) {
             Column<Object> newColumn = new Column<>();
-            filteredDf.addColumn(headerName, newColumn);
-        }
 
-        for (int i = 0; i < column.getSize(); i++) {
-            if (predicate.test(column.getCellValue(i))) {
-                for (Object headerName : this.headers) {
-                    filteredDf.columns.get(headerName).addCell(
+            for (int i = 0; i < column.getSize(); i++) {
+                if (column.getCellValue(i) != null && predicate.test(column.getCellValue(i))) {
+                    newColumn.addCell(
                         this.columns.get(headerName).getCellValue(i)
                     );
                 }
             }
+
+            filteredDf.addColumn(headerName, newColumn);
         }
 
         return filteredDf;
@@ -284,15 +296,14 @@ public class DataFrame {
 
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
-            headDf.addColumn(header, newColumn);
-        }
 
-        for (int i = 0; i < limit; i++) {
-            for (Object header : this.headers) {
-                headDf.columns.get(header).addCell(
+            for (int i = 0; i < limit; i++) {
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
             }
+
+            headDf.addColumn(header, newColumn);
         }
 
         return headDf;
@@ -303,15 +314,14 @@ public class DataFrame {
 
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
-            tailDf.addColumn(header, newColumn);
-        }
 
-        for (int i = this.indexes.size() - limit; i < this.indexes.size(); i++) {
-            for (Object header : this.headers) {
-                tailDf.columns.get(header).addCell(
+            for (int i = this.indexes.size() - limit; i < this.indexes.size(); i++) {
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
             }
+
+            tailDf.addColumn(header, newColumn);
         }
 
         return tailDf;
@@ -321,76 +331,106 @@ public class DataFrame {
         // TODO: validar valor de percent
         DataFrame sampleDf = new DataFrame();
 
-        for (Object header : this.headers) {
-            Column<Object> newColumn = new Column<>();
-            sampleDf.addColumn(header, newColumn);
-        }
-
-        //
         Random random = new Random();
         int sampleSize = (int) (this.indexes.size() * percent);
 
-        for (int i = 0; i < sampleSize; i++) {
-            int randomIndex = random.nextInt(this.indexes.size());
-            for (Object header : this.headers) {
-                sampleDf.columns.get(header).addCell(
+        for (Object header : this.headers) {
+            Column<Object> newColumn = new Column<>();
+
+            for (int i = 0; i < sampleSize; i++) {
+                int randomIndex = random.nextInt(this.indexes.size());
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(randomIndex)
                 );
             }
+            
+            sampleDf.addColumn(header, newColumn);
         }
 
         return sampleDf;
     }
 
     public DataFrame concat(DataFrame df) {
-        // TODO: revisar que coincidan la cantidad de columnas y sus tipos de datos (no necesariamente el nombre de sus headers)
+        if (this.headers.size() != df.headers.size()) {
+            throw new IllegalArgumentException("La cantidad de columnas no coincide.");
+        }
+
+        if (!this.headers.containsAll(df.headers)) {
+            throw new IllegalArgumentException("Los headers no coinciden.");
+        }
+
+        for (Object header : this.headers) {
+            if (!this.columns.get(header).getCellValue(0).getClass().equals(df.columns.get(header).getCellValue(0).getClass())) {
+                throw new IllegalArgumentException(String.format("El tipo de dato de la columna '%s' no coincide.", header.toString()));
+            }
+        }
+
         DataFrame concatDf = new DataFrame();
 
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
-            concatDf.addColumn(header, newColumn);
-        }
 
-        for (int i = 0; i < this.indexes.size(); i++) {
-            for (Object header : this.headers) {
-                concatDf.columns.get(header).addCell(
+            for (int i = 0; i < this.indexes.size(); i++) {
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
             }
-        }
 
-        for (int i = 0; i < df.indexes.size(); i++) {
-            for (Object header : df.headers) {
-                concatDf.columns.get(header).addCell(
+            for (int i = 0; i < df.indexes.size(); i++) {
+                newColumn.addCell(
                     df.columns.get(header).getCellValue(i)
                 );
             }
+
+            concatDf.addColumn(header, newColumn);
         }
 
         return concatDf;
     }
 
     public DataFrame slice(int start, int end) {
+        if (start < 0 || start >= this.indexes.size()) {
+            throw new IllegalArgumentException("El índice de inicio está fuera de rango.");
+        }
+
+        if (end < 0 || end > this.indexes.size()) {
+            throw new IllegalArgumentException("El índice de fin está fuera de rango.");
+        }
+
+        if (start >= end) {
+            throw new IllegalArgumentException("El índice de inicio debe ser menor al índice de fin.");
+        }
+
         DataFrame sliceDf = new DataFrame();
 
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
-            sliceDf.addColumn(header, newColumn);
-        }
 
-        for (int i = start; i < end; i++) {
-            for (Object header : this.headers) {
-                sliceDf.columns.get(header).addCell(
+            for (int i = start; i < end; i++) {
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
             }
+
+            sliceDf.addColumn(header, newColumn);
         }
 
         return sliceDf;
     }
 
     public DataFrame slice(int start, int end, Object[] headers) {
-        // TODO: revisar que esto ande bien
+        if (start < 0 || start >= this.indexes.size()) {
+            throw new IllegalArgumentException("El índice de inicio está fuera de rango.");
+        }
+
+        if (end < 0 || end > this.indexes.size()) {
+            throw new IllegalArgumentException("El índice de fin está fuera de rango.");
+        }
+
+        if (start >= end) {
+            throw new IllegalArgumentException("El índice de inicio debe ser menor al índice de fin.");
+        }
+
         if (headers.length == 0) {
             throw new IllegalArgumentException("Debe especificar al menos un header.");
         }
@@ -407,15 +447,14 @@ public class DataFrame {
 
         for (Object header : headers) {
             Column<Object> newColumn = new Column<>();
-            sliceDf.addColumn(header, newColumn);
-        }
 
-        for (int i = start; i < end; i++) {
-            for (Object header : headers) {
-                sliceDf.columns.get(header).addCell(
+            for (int i = start; i < end; i++) {
+                newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
             }
+
+            sliceDf.addColumn(header, newColumn);
         }
 
         return sliceDf;
@@ -440,7 +479,12 @@ public class DataFrame {
             String key = "";
 
             for (Object header : headers) {
-                key += this.columns.get(header).getCellValue(i).toString() + ',';
+                Object newKey = this.columns.get(header).getCellValue(i);
+                if (newKey != null) {
+                    key += newKey.toString() + ',';
+                } else {
+                    key += "N/A,";
+                }
             }
 
             key = key.substring(0, key.length() - 1);
@@ -535,6 +579,8 @@ public class DataFrame {
                     + countWidth + "d%n",
                     header, dataType, nonNullCount, nullCount);
         }
+    
+        System.out.println("\n");
     }
     
 

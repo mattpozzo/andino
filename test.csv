@@ -1,8 +1,8 @@
 Name,Age,Occupation
 John,25,Engineer
-Doe,30,Doctor
+Doe,,Doctor
 Jane,29,Artist
 Mary,32,Teacher
 Matt,27,
-Chris,26,Programmer
+,26,Programmer
 Chris,46,Programmer

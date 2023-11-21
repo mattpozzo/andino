@@ -41,7 +41,10 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     sums[i] = 0;
                     int cellIndex = this.indexes.indexOf(index);
-                    sums[i] += (int) this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        sums[i] += (int) cellValue;
+                    }
                 }
             }
 
@@ -75,7 +78,10 @@ public class GroupedDataFrame extends DataFrame {
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                sum[0] += (int) this.getColumn(header).getCellValue(cellIndex);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue != null) {
+                    sum[0] += (int) cellValue;
+                }
             }
 
             df.addRow(sum, groupName);
@@ -110,7 +116,10 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     sums[i] = 0;
                     int cellIndex = this.indexes.indexOf(index);
-                    sums[i] += (int) this.getColumn(headers[i]).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        sums[i] += (int) cellValue;
+                    }
                 }
             }
 
@@ -140,7 +149,10 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
             }
@@ -209,7 +221,10 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(headers[i]).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
             }
@@ -245,13 +260,15 @@ public class GroupedDataFrame extends DataFrame {
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
 
-                    if (columnClass.equals(Integer.class)) {
-                        if ((int) cellValue > (int) maxs[i]) {
-                            maxs[i] = cellValue;
-                        }
-                    } else {
-                        if (cellValue.toString().compareTo(maxs[i].toString()) > 0) {
-                            maxs[i] = cellValue;
+                    if (cellValue != null) {
+                        if (columnClass.equals(Integer.class)) {
+                            if ((int) cellValue > (int) maxs[i]) {
+                                maxs[i] = cellValue;
+                            }
+                        } else {
+                            if (cellValue.toString().compareTo(maxs[i].toString()) > 0) {
+                                maxs[i] = cellValue;
+                            }
                         }
                     }
                 }
@@ -264,6 +281,7 @@ public class GroupedDataFrame extends DataFrame {
     }
 
     public DataFrame max(Object header) {
+        // TODO: DESFALOPIZAR TRATAMIENTO DE NA, acá y en otros métodos (ver prints de df sumarizados con NAs)
         if (!this.headers.contains(header)) {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
@@ -288,13 +306,15 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
 
-                if (columnClass.equals(Integer.class)) {
-                    if ((int) cellValue > (int) max[0]) {
-                        max[0] = cellValue;
-                    }
-                } else {
-                    if (cellValue.toString().compareTo(max[0].toString()) > 0) {
-                        max[0] = cellValue;
+                if (cellValue != null) {
+                    if (columnClass.equals(Integer.class)) {
+                        if ((int) cellValue > (int) max[0]) {
+                            max[0] = cellValue;
+                        }
+                    } else {
+                        if (cellValue.toString().compareTo(max[0].toString()) > 0) {
+                            max[0] = cellValue;
+                        }
                     }
                 }
             }
@@ -338,13 +358,15 @@ public class GroupedDataFrame extends DataFrame {
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
 
-                    if (columnClass.equals(Integer.class)) {
-                        if ((int) cellValue > (int) maxs[i]) {
-                            maxs[i] = cellValue;
-                        }
-                    } else {
-                        if (cellValue.toString().compareTo(maxs[i].toString()) > 0) {
-                            maxs[i] = cellValue;
+                    if (cellValue != null) {
+                        if (columnClass.equals(Integer.class)) {
+                            if ((int) cellValue > (int) maxs[i]) {
+                                maxs[i] = cellValue;
+                            }
+                        } else {
+                            if (cellValue.toString().compareTo(maxs[i].toString()) > 0) {
+                                maxs[i] = cellValue;
+                            }
                         }
                     }
                 }
@@ -381,13 +403,15 @@ public class GroupedDataFrame extends DataFrame {
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
 
-                    if (columnClass.equals(Integer.class)) {
-                        if ((int) cellValue < (int) mins[i]) {
-                            mins[i] = cellValue;
-                        }
-                    } else {
-                        if (cellValue.toString().compareTo(mins[i].toString()) < 0) {
-                            mins[i] = cellValue;
+                    if (cellValue != null) {
+                        if (columnClass.equals(Integer.class)) {
+                            if ((int) cellValue < (int) mins[i]) {
+                                mins[i] = cellValue;
+                            }
+                        } else {
+                            if (cellValue.toString().compareTo(mins[i].toString()) < 0) {
+                                mins[i] = cellValue;
+                            }
                         }
                     }
                 }
@@ -424,13 +448,15 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
 
-                if (columnClass.equals(Integer.class)) {
-                    if ((int) cellValue < (int) min[0]) {
-                        min[0] = cellValue;
-                    }
-                } else {
-                    if (cellValue.toString().compareTo(min[0].toString()) < 0) {
-                        min[0] = cellValue;
+                if (cellValue != null) {
+                    if (columnClass.equals(Integer.class)) {
+                        if ((int) cellValue < (int) min[0]) {
+                            min[0] = cellValue;
+                        }
+                    } else {
+                        if (cellValue.toString().compareTo(min[0].toString()) < 0) {
+                            min[0] = cellValue;
+                        }
                     }
                 }
             }
@@ -474,13 +500,15 @@ public class GroupedDataFrame extends DataFrame {
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
 
-                    if (columnClass.equals(Integer.class)) {
-                        if ((int) cellValue < (int) mins[i]) {
-                            mins[i] = cellValue;
-                        }
-                    } else {
-                        if (cellValue.toString().compareTo(mins[i].toString()) < 0) {
-                            mins[i] = cellValue;
+                    if (cellValue != null) {
+                        if (columnClass.equals(Integer.class)) {
+                            if ((int) cellValue < (int) mins[i]) {
+                                mins[i] = cellValue;
+                            }
+                        } else {
+                            if (cellValue.toString().compareTo(mins[i].toString()) < 0) {
+                                mins[i] = cellValue;
+                            }
                         }
                     }
                 }
@@ -513,14 +541,20 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
 
                 for (Object index : groupIndexes) {
                     variances[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    variances[i] += Math.pow((double) this.getColumn(df.headers.get(i)).getCellValue(cellIndex) - means[i], 2);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        variances[i] += Math.pow((double) cellValue - means[i], 2);
+                    }
                 }
                 variances[i] /= groupIndexes.size();
             }
@@ -554,13 +588,19 @@ public class GroupedDataFrame extends DataFrame {
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                mean += (double) this.getColumn(header).getCellValue(cellIndex);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue != null) {
+                    mean += (double) cellValue;
+                }
             }
             mean /= groupIndexes.size();
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                variance[0] += Math.pow((double) this.getColumn(header).getCellValue(cellIndex) - mean, 2);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue != null) {
+                    variance[0] += Math.pow((double) cellValue - mean, 2);
+                }
             }
             variance[0] /= groupIndexes.size();
 
@@ -597,14 +637,20 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(headers[i]).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
 
                 for (Object index : groupIndexes) {
                     variances[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    variances[i] += Math.pow((double) this.getColumn(headers[i]).getCellValue(cellIndex) - means[i], 2);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        variances[i] += Math.pow((double) cellValue - means[i], 2);
+                    }
                 }
                 variances[i] /= groupIndexes.size();
             }
@@ -636,14 +682,20 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
 
                 for (Object index : groupIndexes) {
                     stds[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    stds[i] += Math.pow((double) this.getColumn(df.headers.get(i)).getCellValue(cellIndex) - means[i], 2);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        stds[i] += Math.pow((double) cellValue - means[i], 2);
+                    }
                 }
                 stds[i] /= groupIndexes.size();
                 stds[i] = Math.sqrt(stds[i]);
@@ -678,13 +730,19 @@ public class GroupedDataFrame extends DataFrame {
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                mean += (double) this.getColumn(header).getCellValue(cellIndex);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue != null) {
+                    mean += (double) cellValue;
+                }
             }
             mean /= groupIndexes.size();
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
-                std[0] += Math.pow((double) this.getColumn(header).getCellValue(cellIndex) - mean, 2);
+                Object cellValue = this.getColumn(header).getCellValue(cellIndex);
+                if (cellValue != null) {
+                    std[0] += Math.pow((double) cellValue - mean, 2);
+                }
             }
             std[0] /= groupIndexes.size();
             std[0] = Math.sqrt(std[0]);
@@ -722,14 +780,20 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    means[i] += (double) this.getColumn(headers[i]).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        means[i] += (double) cellValue;
+                    }
                 }
                 means[i] /= groupIndexes.size();
 
                 for (Object index : groupIndexes) {
                     stds[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    stds[i] += Math.pow((double) this.getColumn(headers[i]).getCellValue(cellIndex) - means[i], 2);
+                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    if (cellValue != null) {
+                        stds[i] += Math.pow((double) cellValue - means[i], 2);
+                    }
                 }
                 stds[i] /= groupIndexes.size();
                 stds[i] = Math.sqrt(stds[i]);
