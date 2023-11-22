@@ -1,0 +1,8 @@
+Name,Age,Occupation,Smoker,Weight
+Mike,25,Engineer,,Sixty
+Doe,,Doctor,false,Seventy three
+,29,,true,Fifty seven
+Mary,32,Teacher,false,Fifty six
+Matt,27,,false,Sixty nine
+Jane,26,Programmer,true,
+Chris,46,Programmer,false,Eighty two

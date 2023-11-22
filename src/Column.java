@@ -2,7 +2,7 @@
 package src;
 import java.util.ArrayList;
 
-public class Column<T> {
+public class Column<T> implements Comparable<Column<T>>{
     private ArrayList<Cell<T>> cells = new ArrayList<>();
 
     public Column() {}
@@ -26,11 +26,57 @@ public class Column<T> {
     }
 
     public void addCell(T cell) {
+        if (!this.cells.isEmpty() && cell != null) {
+            Object firstValue = this.getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null && firstCount < this.cells.size()) {
+                firstValue = this.getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue != null && cell.getClass() != firstValue.getClass()) {
+                throw new IllegalArgumentException("El tipo de dato no coincide con el tipo de datos de la columna");
+            }
+        }
+
         this.cells.add(new Cell<>(cell));
     }
 
     public void addCell(T cell, int index) {
+        if (!this.cells.isEmpty() && cell != null) {
+            Object firstValue = this.getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null && firstCount < this.cells.size()) {
+                firstValue = this.getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue != null && cell.getClass() != firstValue.getClass()) {
+                throw new IllegalArgumentException("El tipo de dato no coincide con el tipo de datos de la columna");
+            }
+        }
+
         this.cells.add(index, new Cell<>(cell));
+    }
+
+    public void setCell(T cell, int index) {
+        if (!this.cells.isEmpty() && cell != null) {
+            Object firstValue = this.getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null && firstCount < this.cells.size()) {
+                firstValue = this.getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue != null && cell.getClass() != firstValue.getClass()) {
+                throw new IllegalArgumentException("El tipo de dato no coincide con el tipo de datos de la columna");
+            }
+        }
+
+        this.cells.set(index, new Cell<>(cell));
     }
 
     public void removeIndex(int index) {
@@ -49,11 +95,28 @@ public class Column<T> {
         }
     }
 
+    @Override
+    public String toString() {
+        String column = "[";
+        for (Cell<T> cell : cells) {
+            column += cell.getValue() + ", ";
+        }
+        column = column.substring(0, column.length() - 2);
+        column += "]";
+        return column;
+    }
+
     public T[] toArray() {
         T[] array = (T[]) new Object[this.cells.size()];
         for (int i=0; i < this.cells.size(); i++) {
             array[i] = this.cells.get(i).getValue();
         }
         return array;
+    }
+
+    @Override
+    public int compareTo(Column<T> o) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
     }
 }

@@ -25,7 +25,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            if (this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue.getClass().equals(Integer.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("sum " + header.toString(), column);
             }
@@ -38,10 +46,13 @@ public class GroupedDataFrame extends DataFrame {
             Integer[] sums = new Integer[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+                
                 for (Object index : groupIndexes) {
                     sums[i] = 0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
                         sums[i] += (int) cellValue;
                     }
@@ -55,12 +66,20 @@ public class GroupedDataFrame extends DataFrame {
     }
 
     public DataFrame sum(Object header) {
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
         if (!this.headers.contains(header)) {
             // TODO: Definir clase para este tipo de excepción
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
         
-        if (!this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+        if (!firstValue.getClass().equals(Integer.class)) {
             // TODO: Definir clase para este tipo de excepción
             throw new IllegalArgumentException("La columna seleccionada no es numérica.");
         }
@@ -95,7 +114,17 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("Alguno de los headers no pertenece al DataFrame.");
         }
         
-        if (!Arrays.stream(headers).allMatch(header -> !this.getColumn(header).getCellValue(0).getClass().equals(Integer.class))) {
+        if (!Arrays.stream(headers).allMatch(header -> {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            return firstValue.getClass().equals(Integer.class);
+        })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica.");
         }
 
@@ -113,10 +142,13 @@ public class GroupedDataFrame extends DataFrame {
             Integer[] sums = new Integer[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+
                 for (Object index : groupIndexes) {
                     sums[i] = 0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
                         sums[i] += (int) cellValue;
                     }
@@ -133,7 +165,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            if (this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue.getClass().equals(Integer.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("mean " + header.toString(), column);
             }
@@ -146,12 +186,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] means = new Double[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(5, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -164,8 +207,20 @@ public class GroupedDataFrame extends DataFrame {
     }
 
     public DataFrame mean(Object header) {
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
         if (!this.headers.contains(header)) {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
+        }
+        
+        if (!firstValue.getClass().equals(Integer.class)) {
+            throw new IllegalArgumentException("La columna seleccionada no es numérica.");
         }
     
         DataFrame df = new DataFrame();
@@ -200,7 +255,17 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("Alguno de los headers no pertenece al DataFrame.");
         }
 
-        if (!Arrays.stream(headers).allMatch(header -> !this.getColumn(header).getCellValue(0).getClass().equals(Integer.class))) {
+        if (!Arrays.stream(headers).allMatch(header -> {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            return firstValue.getClass().equals(Integer.class);
+        })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica.");
         }
 
@@ -218,12 +283,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] means = new Double[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(5, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -239,7 +307,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            Class<?> columnClass = firstValue.getClass();
             if (columnClass.equals(Integer.class) || columnClass.equals(String.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("max " + header.toString(), column);
@@ -253,12 +329,23 @@ public class GroupedDataFrame extends DataFrame {
             Object[] maxs = new Object[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
-                Class<?> columnClass = this.getColumn(df.headers.get(i)).getCellValue(0).getClass();
-                maxs[i] = this.getColumn(df.headers.get(i)).getCellValue(0);
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+
+                Object firstValue = this.getColumn(originalHeader).getCellValue(0);
+                int firstCount = 1;
+
+                while (firstValue == null) {
+                    firstValue = this.getColumn(originalHeader).getCellValue(firstCount);
+                    firstCount++;
+                }
+
+                Class<?> columnClass = firstValue.getClass();
+                maxs[i] = firstValue;
 
                 for (Object index : groupIndexes) {
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
 
                     if (cellValue != null) {
                         if (columnClass.equals(Integer.class)) {
@@ -286,7 +373,15 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
 
-        Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
+        Class<?> columnClass = firstValue.getClass();
         if (!columnClass.equals(Integer.class) && !columnClass.equals(String.class)) {
             throw new IllegalArgumentException("La columna seleccionada no es numérica o string.");
         }
@@ -300,7 +395,7 @@ public class GroupedDataFrame extends DataFrame {
             String groupName = group.getKey();
             List<Object> groupIndexes = group.getValue();
 
-            Object[] max = {this.getColumn(header).getCellValue(0)};
+            Object[] max = {firstValue};
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
@@ -331,7 +426,15 @@ public class GroupedDataFrame extends DataFrame {
         }
 
         if (!Arrays.stream(headers).allMatch(header -> {
-            Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            Class<?> columnClass = firstValue.getClass();
             return columnClass.equals(Integer.class) || columnClass.equals(String.class);
         })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica o string.");
@@ -351,8 +454,16 @@ public class GroupedDataFrame extends DataFrame {
             Object[] maxs = new Object[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
-                Class<?> columnClass = this.getColumn(headers[i]).getCellValue(0).getClass();
-                maxs[i] = this.getColumn(headers[i]).getCellValue(0);
+                Object firstValue = this.getColumn(headers[i]).getCellValue(0);
+                int firstCount = 1;
+
+                while (firstValue == null) {
+                    firstValue = this.getColumn(headers[i]).getCellValue(firstCount);
+                    firstCount++;
+                }
+
+                Class<?> columnClass = firstValue.getClass();
+                maxs[i] = firstValue;
 
                 for (Object index : groupIndexes) {
                     int cellIndex = this.indexes.indexOf(index);
@@ -382,7 +493,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            Class<?> columnClass = firstValue.getClass();
             if (columnClass.equals(Integer.class) || columnClass.equals(String.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("min " + header.toString(), column);
@@ -396,12 +515,23 @@ public class GroupedDataFrame extends DataFrame {
             Object[] mins = new Object[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
-                Class<?> columnClass = this.getColumn(df.headers.get(i)).getCellValue(0).getClass();
-                mins[i] = this.getColumn(df.headers.get(i)).getCellValue(0);
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+
+                Object firstValue = this.getColumn(originalHeader).getCellValue(0);
+                int firstCount = 1;
+
+                while (firstValue == null) {
+                    firstValue = this.getColumn(originalHeader).getCellValue(firstCount);
+                    firstCount++;
+                }
+
+                Class<?> columnClass = firstValue.getClass();
+                mins[i] = firstValue;
 
                 for (Object index : groupIndexes) {
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
 
                     if (cellValue != null) {
                         if (columnClass.equals(Integer.class)) {
@@ -428,7 +558,15 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
 
-        Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
+        Class<?> columnClass = firstValue.getClass();
         if (!columnClass.equals(Integer.class) && !columnClass.equals(String.class)) {
             throw new IllegalArgumentException("La columna seleccionada no es numérica o string.");
         }
@@ -442,7 +580,7 @@ public class GroupedDataFrame extends DataFrame {
             String groupName = group.getKey();
             List<Object> groupIndexes = group.getValue();
 
-            Object[] min = {this.getColumn(header).getCellValue(0)};
+            Object[] min = {firstValue};
 
             for (Object index : groupIndexes) {
                 int cellIndex = this.indexes.indexOf(index);
@@ -473,7 +611,15 @@ public class GroupedDataFrame extends DataFrame {
         }
 
         if (!Arrays.stream(headers).allMatch(header -> {
-            Class<?> columnClass = this.getColumn(header).getCellValue(0).getClass();
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            Class<?> columnClass = firstValue.getClass();
             return columnClass.equals(Integer.class) || columnClass.equals(String.class);
         })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica o string.");
@@ -493,8 +639,16 @@ public class GroupedDataFrame extends DataFrame {
             Object[] mins = new Object[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
-                Class<?> columnClass = this.getColumn(headers[i]).getCellValue(0).getClass();
-                mins[i] = this.getColumn(headers[i]).getCellValue(0);
+                Object firstValue = this.getColumn(headers[i]).getCellValue(0);
+                int firstCount = 1;
+
+                while (firstValue == null) {
+                    firstValue = this.getColumn(headers[i]).getCellValue(firstCount);
+                    firstCount++;
+                }
+
+                Class<?> columnClass = firstValue.getClass();
+                mins[i] = firstValue;
 
                 for (Object index : groupIndexes) {
                     int cellIndex = this.indexes.indexOf(index);
@@ -524,7 +678,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            if (this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue.getClass().equals(Integer.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("variance " + header.toString(), column);
             }
@@ -538,12 +700,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] variances = new Double[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(9, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -551,9 +716,9 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     variances[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        variances[i] += Math.pow((double) cellValue - means[i], 2);
+                        variances[i] += Math.pow((double) ((int) cellValue) - means[i], 2);
                     }
                 }
                 variances[i] /= groupIndexes.size();
@@ -570,7 +735,15 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
 
-        if (!this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
+        if (!firstValue.getClass().equals(Integer.class)) {
             throw new IllegalArgumentException("La columna seleccionada no es numérica.");
         }
 
@@ -590,7 +763,7 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
                 if (cellValue != null) {
-                    mean += (double) cellValue;
+                    mean += (double) (int) cellValue;
                 }
             }
             mean /= groupIndexes.size();
@@ -599,7 +772,7 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
                 if (cellValue != null) {
-                    variance[0] += Math.pow((double) cellValue - mean, 2);
+                    variance[0] += Math.pow((double) ((int) cellValue) - mean, 2);
                 }
             }
             variance[0] /= groupIndexes.size();
@@ -615,7 +788,17 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("Alguno de los headers no pertenece al DataFrame.");
         }
 
-        if (!Arrays.stream(headers).allMatch(header -> !this.getColumn(header).getCellValue(0).getClass().equals(Integer.class))) {
+        if (!Arrays.stream(headers).allMatch(header -> {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            return firstValue.getClass().equals(Integer.class);
+        })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica.");
         }
 
@@ -634,12 +817,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] variances = new Double[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(9, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -647,9 +833,9 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     variances[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        variances[i] += Math.pow((double) cellValue - means[i], 2);
+                        variances[i] += Math.pow((double) ((int) cellValue) - means[i], 2);
                     }
                 }
                 variances[i] /= groupIndexes.size();
@@ -665,7 +851,15 @@ public class GroupedDataFrame extends DataFrame {
         DataFrame df = new DataFrame();
 
         for (Object header : this.headers) {
-            if (this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            if (firstValue.getClass().equals(Integer.class)) {
                 Column<Object> column = new Column<>();
                 df.addColumn("std " + header.toString(), column);
             }
@@ -679,12 +873,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] stds = new Double[df.headers.size()];
 
             for (int i = 0; i < df.headers.size(); i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -692,9 +889,9 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     stds[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        stds[i] += Math.pow((double) cellValue - means[i], 2);
+                        stds[i] += Math.pow((double) ((int) cellValue) - means[i], 2);
                     }
                 }
                 stds[i] /= groupIndexes.size();
@@ -712,7 +909,15 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("El header no pertenece al DataFrame.");
         }
 
-        if (!this.getColumn(header).getCellValue(0).getClass().equals(Integer.class)) {
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
+        if (!firstValue.getClass().equals(Integer.class)) {
             throw new IllegalArgumentException("La columna seleccionada no es numérica.");
         }
 
@@ -732,7 +937,7 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
                 if (cellValue != null) {
-                    mean += (double) cellValue;
+                    mean += (double) (int) cellValue;
                 }
             }
             mean /= groupIndexes.size();
@@ -741,7 +946,7 @@ public class GroupedDataFrame extends DataFrame {
                 int cellIndex = this.indexes.indexOf(index);
                 Object cellValue = this.getColumn(header).getCellValue(cellIndex);
                 if (cellValue != null) {
-                    std[0] += Math.pow((double) cellValue - mean, 2);
+                    std[0] += Math.pow((double) ((int) cellValue) - mean, 2);
                 }
             }
             std[0] /= groupIndexes.size();
@@ -758,7 +963,17 @@ public class GroupedDataFrame extends DataFrame {
             throw new IllegalArgumentException("Alguno de los headers no pertenece al DataFrame.");
         }
 
-        if (!Arrays.stream(headers).allMatch(header -> !this.getColumn(header).getCellValue(0).getClass().equals(Integer.class))) {
+        if (!Arrays.stream(headers).allMatch(header -> {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            return firstValue.getClass().equals(Integer.class);
+        })) {
             throw new IllegalArgumentException("Alguna de las columnas seleccionadas no es numérica.");
         }
 
@@ -777,12 +992,15 @@ public class GroupedDataFrame extends DataFrame {
             Double[] stds = new Double[headers.length];
 
             for (int i = 0; i < headers.length; i++) {
+                String header = df.headers.get(i).toString();
+                String originalHeader = header.substring(4, header.length());
+
                 for (Object index : groupIndexes) {
                     means[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
                     Object cellValue = this.getColumn(headers[i]).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        means[i] += (double) cellValue;
+                        means[i] += (double) (int) cellValue;
                     }
                 }
                 means[i] /= groupIndexes.size();
@@ -790,9 +1008,9 @@ public class GroupedDataFrame extends DataFrame {
                 for (Object index : groupIndexes) {
                     stds[i] = 0.0;
                     int cellIndex = this.indexes.indexOf(index);
-                    Object cellValue = this.getColumn(df.headers.get(i)).getCellValue(cellIndex);
+                    Object cellValue = this.getColumn(originalHeader).getCellValue(cellIndex);
                     if (cellValue != null) {
-                        stds[i] += Math.pow((double) cellValue - means[i], 2);
+                        stds[i] += Math.pow((double) ((int) cellValue) - means[i], 2);
                     }
                 }
                 stds[i] /= groupIndexes.size();

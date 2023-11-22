@@ -1,2 +1,7 @@
-Data1,100
-Data2,200
+John,25,Engineer,true,60
+Doe,,Doctor,false,73
+Jane,29,Artist,true,
+Mary,32,Teacher,,56
+Matt,27,,false,69
+,26,Programmer,true,82
+Chris,46,Programmer,true,80

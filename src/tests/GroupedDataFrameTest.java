@@ -1,4 +1,9 @@
-package src;
+package src.tests;
+
+import src.Column;
+import src.CsvReader;
+import src.DataFrame;
+import src.GroupedDataFrame;
 
 public class GroupedDataFrameTest {
 
@@ -31,7 +36,7 @@ public class GroupedDataFrameTest {
 
     public static void main(String[] args) {
         CsvReader reader = new CsvReader(',', true);
-        DataFrame df = reader.read("test.csv");
+        DataFrame df = reader.read("testNoNA.csv");
 
         // Imprimir el DataFrame original
         System.out.println("DataFrame Original:");

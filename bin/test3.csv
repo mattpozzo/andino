@@ -1,0 +1,8 @@
+Name,Age,Occupation,Smoker
+John,25,Engineer,true
+Doe,,Doctor,false
+Jane,29,Artist,true
+Mary,32,Teacher,
+Matt,27,,false
+,26,Programmer,true
+Chris,46,Programmer,false
