@@ -30,16 +30,48 @@ public class DataFrame {
         } else if (column.getSize() != this.indexes.size()) {
             throw new IllegalArgumentException("El tamaño de la columna no coincide con la cantidad de filas.");
         }
+
+        if (this.headers.contains(header)) {
+            // TODO: Definir clase para este tipo de excepción
+            throw new IllegalArgumentException("El header ya existe.");
+        }
+
         this.columns.put(header, column);
         this.headers.add(header);
     }
 
     public Column<Object> getColumn(Object header) {
+        if (!this.headers.contains(header)) {
+            throw new IllegalArgumentException(String.format("El header '%s' no existe.", header.toString()));
+        }
+
         return this.columns.get(header);
     }
 
     public Map<Object, Column<Object>> getColumns() {
         return this.columns;
+    }
+
+    public Map<Object, Column<Object>> getColumns(Object[] headers) {
+        if (headers.length == 0) {
+            throw new IllegalArgumentException("Debe especificar al menos un header.");
+        }
+
+        if (headers.length > this.headers.size()) {
+            throw new IllegalArgumentException("La cantidad de headers especificados es mayor a la cantidad de headers del DataFrame.");
+        }
+
+        if (!this.headers.containsAll(Arrays.asList(headers))) {
+            throw new IllegalArgumentException("Alguno de los headers especificados no existe.");
+        }
+
+        Map<Object, Column<Object>> gotColumns = new HashMap<>();
+
+        for (Object header : headers) {
+            gotColumns.put(header, this.columns.get(header));
+        }
+
+        return gotColumns;
     }
 
     public void addRow(Object[] row) {
@@ -90,12 +122,74 @@ public class DataFrame {
         this.indexes.add(index); 
     }
 
+    public void setCell(Object value, Object index, Object header) {
+        if (!this.indexes.contains(index)) {
+            throw new IllegalArgumentException(String.format("El índice '%s' no existe.", index.toString()));
+        }
+
+        if (!this.headers.contains(header)) {
+            throw new IllegalArgumentException(String.format("El header '%s' no existe.", header.toString()));
+        }
+
+        Object firstValue = this.getColumn(header).getCellValue(0);
+        int firstCount = 1;
+
+        while (firstValue == null) {
+            firstValue = this.getColumn(header).getCellValue(firstCount);
+            firstCount++;
+        }
+
+        if (value != null && !value.getClass().equals(firstValue.getClass())) {
+            throw new IllegalArgumentException("El tipo de dato no coincide con el tipo de dato de la columna.");
+        }
+
+        this.columns.get(header).setCell(value, this.indexes.indexOf(index));
+    }
+
     public List<Object> getRow(Object index) {
+        if (!this.indexes.contains(index)) {
+            throw new IllegalArgumentException(String.format("El índice '%s' no existe.", index.toString()));
+        }
+
         List<Object> row = new ArrayList<>();
         for (Object header : this.headers) {
             row.add(this.columns.get(header).getCellValue(this.indexes.indexOf(index)));
         }
         return row;
+    }
+
+    public List<List<Object>> getRows(Object[] indexes) {
+        if (indexes.length == 0) {
+            throw new IllegalArgumentException("Debe especificar al menos un índice.");
+        }
+
+        if (indexes.length > this.indexes.size()) {
+            throw new IllegalArgumentException("La cantidad de índices especificados es mayor a la cantidad de índices del DataFrame.");
+        }
+
+        if (!this.indexes.containsAll(Arrays.asList(indexes))) {
+            throw new IllegalArgumentException("Alguno de los índices especificados no existe.");
+        }
+        
+        List<List<Object>> rows = new ArrayList<>();
+
+        for (Object index : indexes) {
+            rows.add(this.getRow(index));
+        }
+
+        return rows;
+    }
+
+    public Object getCell(Object index, Object header) {
+        if (!this.indexes.contains(index)) {
+            throw new IllegalArgumentException(String.format("El índice '%s' no existe.", index.toString()));
+        }
+
+        if (!this.headers.contains(header)) {
+            throw new IllegalArgumentException(String.format("El header '%s' no existe.", header.toString()));
+        }
+
+        return this.columns.get(header).getCellValue(this.indexes.indexOf(index));
     }
 
     public List<Object> getHeaders() {
@@ -267,8 +361,55 @@ public class DataFrame {
         return sb.toString();
     }
     
-    
+    public String toString(int maxRows, int maxCols) {
+        if (maxRows < 0 || maxCols < 0) {
+            throw new IllegalArgumentException("Los valores de maxRows y maxCols deben ser mayores o iguales a 0.");
+        }
 
+        if (maxRows > this.indexes.size()) {
+            maxRows = this.indexes.size();
+        }
+
+        if (maxCols > this.headers.size()) {
+            maxCols = this.headers.size();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        
+        // Define el ancho para las columnas y los índices
+        int indexWidth = 6; // Ajusta este valor según tus necesidades
+        int columnWidth = 12; // Ajusta este valor según tus necesidades
+    
+        // Encabezado de la tabla
+        sb.append(String.format("%-" + indexWidth + "s", "Index"));
+        for (int i = 0; i < maxCols; i++) {
+            sb.append(String.format("| %-" + columnWidth + "s", this.headers.get(i)));
+        }
+        if (maxCols < this.headers.size()) {
+            sb.append("| ...");
+        }
+        sb.append("\n");
+    
+        // Datos de la tabla
+        for (int i = 0; i < maxRows; i++) {
+            sb.append(String.format("%-" + indexWidth + "s", this.indexes.get(i).toString())); // Asumiendo que los índices pueden ser de cualquier tipo
+            for (int j = 0; j < maxCols; j++) {
+                Object value = this.columns.get(this.headers.get(j)).getCellValue(i);
+                String formattedValue = value == null ? "N/A" : value.toString();
+                sb.append(String.format("| %-" + columnWidth + "s", formattedValue));
+            }
+            if (maxCols < this.headers.size()) {
+                sb.append("| ...");
+            }
+            sb.append("\n");
+        }
+        if (maxRows < this.indexes.size()) {
+            sb.append("...\n");
+        }
+    
+        return sb.toString();
+    }
+    
     public void deleteRow(Object index) {
         if (!this.indexes.contains(index)) {
             throw new IllegalArgumentException(String.format("El índice '%s' no existe.", index.toString()));
@@ -292,6 +433,14 @@ public class DataFrame {
     }
 
     public DataFrame head(int limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException("El valor de limit debe ser mayor o igual a 0.");
+        }
+
+        if (limit > this.indexes.size()) {
+            limit = this.indexes.size();
+        }
+
         DataFrame headDf = new DataFrame();
 
         for (Object header : this.headers) {
@@ -310,6 +459,14 @@ public class DataFrame {
     }
 
     public DataFrame tail(int limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException("El valor de limit debe ser mayor o igual a 0.");
+        }
+
+        if (limit > this.indexes.size()) {
+            limit = this.indexes.size();
+        }
+
         DataFrame tailDf = new DataFrame();
 
         for (Object header : this.headers) {
@@ -328,23 +485,23 @@ public class DataFrame {
     }
 
     public DataFrame sample(float percent) {
-        // TODO: validar valor de percent
+        if (percent < 0 || percent > 100) {
+            throw new IllegalArgumentException("El valor de percent debe estar entre 0 y 100.");
+        }
+
         DataFrame sampleDf = new DataFrame();
 
         Random random = new Random();
-        int sampleSize = (int) (this.indexes.size() * percent);
+        int sampleSize = (int) (this.indexes.size() * percent/100);
 
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
-
-            for (int i = 0; i < sampleSize; i++) {
-                int randomIndex = random.nextInt(this.indexes.size());
-                newColumn.addCell(
-                    this.columns.get(header).getCellValue(randomIndex)
-                );
-            }
-            
             sampleDf.addColumn(header, newColumn);
+        }
+
+        for (int i = 0; i < sampleSize; i++) {
+            int randomIndex = random.nextInt(this.indexes.size());
+            sampleDf.addRow(this.getRow(this.indexes.get(randomIndex)).toArray());
         }
 
         return sampleDf;
@@ -360,7 +517,22 @@ public class DataFrame {
         }
 
         for (Object header : this.headers) {
-            if (!this.columns.get(header).getCellValue(0).getClass().equals(df.columns.get(header).getCellValue(0).getClass())) {
+            Object firstValue = this.getColumn(header).getCellValue(0);
+            Object firstDfValue = df.getColumn(header).getCellValue(0);
+            int firstCount = 1;
+            int firstDfCount = 1;
+
+            while (firstValue == null) {
+                firstValue = this.getColumn(header).getCellValue(firstCount);
+                firstCount++;
+            }
+
+            while (firstDfValue == null) {
+                firstDfValue = df.getColumn(header).getCellValue(firstDfCount);
+                firstDfCount++;
+            }
+
+            if (!firstValue.getClass().equals(firstDfValue.getClass())) {
                 throw new IllegalArgumentException(String.format("El tipo de dato de la columna '%s' no coincide.", header.toString()));
             }
         }
@@ -388,16 +560,16 @@ public class DataFrame {
         return concatDf;
     }
 
-    public DataFrame slice(int start, int end) {
-        if (start < 0 || start >= this.indexes.size()) {
-            throw new IllegalArgumentException("El índice de inicio está fuera de rango.");
+    public DataFrame slice(Object start, Object end) {
+        if (!this.indexes.contains(start)) {
+            throw new IllegalArgumentException(String.format("El índice de inicio '%s' no existe.", start.toString()));
         }
 
-        if (end < 0 || end > this.indexes.size()) {
-            throw new IllegalArgumentException("El índice de fin está fuera de rango.");
+        if (!this.indexes.contains(end)) {
+            throw new IllegalArgumentException(String.format("El índice de fin '%s' no existe.", end.toString()));
         }
 
-        if (start >= end) {
+        if (this.indexes.indexOf(start) >= this.indexes.indexOf(end)) {
             throw new IllegalArgumentException("El índice de inicio debe ser menor al índice de fin.");
         }
 
@@ -406,7 +578,7 @@ public class DataFrame {
         for (Object header : this.headers) {
             Column<Object> newColumn = new Column<>();
 
-            for (int i = start; i < end; i++) {
+            for (int i = this.indexes.indexOf(start); i <= this.indexes.indexOf(end); i++) {
                 newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
@@ -418,16 +590,16 @@ public class DataFrame {
         return sliceDf;
     }
 
-    public DataFrame slice(int start, int end, Object[] headers) {
-        if (start < 0 || start >= this.indexes.size()) {
-            throw new IllegalArgumentException("El índice de inicio está fuera de rango.");
+    public DataFrame slice(Object start, Object end, Object[] headers) {
+        if (!this.indexes.contains(start)) {
+            throw new IllegalArgumentException(String.format("El índice de inicio '%s' no existe.", start.toString()));
         }
 
-        if (end < 0 || end > this.indexes.size()) {
-            throw new IllegalArgumentException("El índice de fin está fuera de rango.");
+        if (!this.indexes.contains(end)) {
+            throw new IllegalArgumentException(String.format("El índice de fin '%s' no existe.", end.toString()));
         }
 
-        if (start >= end) {
+        if (this.indexes.indexOf(start) >= this.indexes.indexOf(end)) {
             throw new IllegalArgumentException("El índice de inicio debe ser menor al índice de fin.");
         }
 
@@ -448,7 +620,7 @@ public class DataFrame {
         for (Object header : headers) {
             Column<Object> newColumn = new Column<>();
 
-            for (int i = start; i < end; i++) {
+            for (int i = this.indexes.indexOf(start); i <= this.indexes.indexOf(end); i++) {
                 newColumn.addCell(
                     this.columns.get(header).getCellValue(i)
                 );
@@ -533,7 +705,14 @@ public class DataFrame {
 
             for (int i = 0; i < indexes.size(); i++) {
                 for (int j = 0; j < headers.size(); j++) {
+                    Object value = getColumn(headers.get(j)).getCellValue(i);
+
+                    if (value != null) {
                     writer.print(getColumn(headers.get(j)).getCellValue(i));
+                    } else {
+                        writer.print("");
+                    }
+
                     if (j < headers.size() - 1) {
                         writer.print(delimiter);
                     }
@@ -550,6 +729,7 @@ public class DataFrame {
         int countWidth = 10;
     
         System.out.println("Información del DataFrame:");
+        System.out.println("Cantidad de columnas: " + this.columns.size());
         System.out.printf("%-" + columnWidth + "s%-"
                 + typeWidth + "s%-"
                 + countWidth + "s%-"

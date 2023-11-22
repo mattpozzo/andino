@@ -1,8 +1,8 @@
-Name,Age,Occupation
-John,25,Engineer
-Doe,,Doctor
-Jane,29,Artist
-Mary,32,Teacher
-Matt,27,
-,26,Programmer
-Chris,46,Programmer
+Name,Age,Occupation,Smoker,Weight
+John,25,Engineer,true,60
+Doe,,Doctor,false,73
+Jane,29,Artist,true,
+Mary,32,Teacher,,56
+Matt,27,,false,69
+,26,Programmer,true,82
+Chris,46,Programmer,true,80
