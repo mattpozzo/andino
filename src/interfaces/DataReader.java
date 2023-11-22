@@ -1,5 +1,7 @@
 package src.interfaces;
 
-public class DataReader {
-    
+import src.DataFrame;
+
+public interface DataReader {
+    public abstract DataFrame read(String filePath);
 }
